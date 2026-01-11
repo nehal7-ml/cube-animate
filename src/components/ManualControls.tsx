@@ -1,0 +1,149 @@
+import { useState, useRef, useCallback } from 'react';
+
+interface Props {
+  onMove: (m: string) => void;
+  onClose: () => void;
+  className?: string;
+  extraHeaderProps?: any;
+}
+
+const LONG_PRESS_MS = 300;
+
+const LongPressButton = ({ move, onMove }: { move: string, onMove: (m: string) => void }) => {
+  const [isPrime, setIsPrime] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
+  const timerRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number>(0);
+
+  const start = useCallback((e: React.PointerEvent) => {
+    e.preventDefault(); 
+    setIsPressed(true);
+    setIsPrime(false);
+    startTimeRef.current = Date.now();
+
+    timerRef.current = setTimeout(() => {
+      setIsPrime(true);
+      if (navigator.vibrate) navigator.vibrate(50);
+    }, LONG_PRESS_MS);
+  }, []);
+
+  const end = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    if (!isPressed) return;
+
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    const elapsed = Date.now() - startTimeRef.current;
+    if (elapsed < LONG_PRESS_MS) {
+      onMove(move);
+    } else {
+      onMove(move + "'");
+    }
+
+    setIsPressed(false);
+    setIsPrime(false);
+  }, [isPressed, move, onMove]);
+
+  const cancel = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    setIsPressed(false);
+    setIsPrime(false);
+  }, []);
+
+  return (
+    <button
+      onPointerDown={start}
+      onPointerUp={end}
+      onPointerLeave={cancel}
+      onPointerCancel={cancel}
+      className={`
+        relative w-full aspect-square rounded-xl font-bold text-xl lg:text-3xl transition-all duration-200 select-none
+        flex items-center justify-center shadow-lg cursor-pointer active:scale-95
+        ${isPressed 
+            ? (isPrime ? 'bg-red-600 text-white shadow-red-500/50 scale-95' : 'bg-blue-500 text-white scale-95') 
+            : 'bg-slate-700 text-slate-200 hover:bg-slate-600'}
+      `}
+    >
+      <span className="relative z-10">{move}{isPrime ? "'" : ""}</span>
+      
+      {/* Progress Indicator for Long Press */}
+      {isPressed && !isPrime && (
+        <svg className="absolute inset-0 w-full h-full p-1 opacity-50" viewBox="0 0 100 100">
+           <circle 
+             cx="50" cy="50" r="46" 
+             fill="none" 
+             stroke="currentColor" 
+             strokeWidth="8"
+             strokeDasharray="289"
+             strokeDashoffset="289"
+             className="animate-spin-fill"
+             style={{
+                animation: `dash ${LONG_PRESS_MS}ms linear forwards`,
+                transformOrigin: 'center',
+                transform: 'rotate(-90deg)'
+             }}
+           />
+        </svg>
+      )}
+      
+      {/* Hint Text */}
+      <span className="absolute bottom-1 text-[8px] lg:text-[10px] font-mono opacity-50 uppercase tracking-wider">
+        {isPrime ? "PRIME" : "HOLD"}
+      </span>
+    </button>
+  );
+};
+
+export function ManualControls({ onMove, onClose, className = "", extraHeaderProps = {} }: Props) {
+  const rows = [
+    ['U', 'u', 'E', 'd', 'D'],
+    ['L', 'l', 'M', 'r', 'R'],
+    ['F', 'f', 'S', 'b', 'B']
+  ];
+
+  return (
+    <div className={`bg-slate-900 border border-slate-700 shadow-2xl flex flex-col rounded-2xl ${className}`}>
+      {/* Header */}
+      <div 
+        className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-850 shrink-0 cursor-move touch-none"
+        {...extraHeaderProps}
+      >
+        <div className="flex flex-col">
+          <h2 className="text-lg font-bold text-slate-100">Manual Control</h2>
+          <span className="text-xs text-slate-400">Tap for CW • Hold for Prime (')</span>
+        </div>
+        <button 
+          onClick={onClose}
+          className="p-2 bg-slate-800 hover:bg-slate-700 rounded-full transition-colors text-slate-300"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      {/* Grid */}
+      <div className="p-4 lg:p-6 overflow-y-auto flex-1">
+         <div className="grid grid-cols-5 gap-3 md:gap-4 lg:gap-5">
+           {rows.flat().map(move => (
+             <LongPressButton 
+               key={move} 
+               move={move} 
+               onMove={onMove} 
+             />
+           ))}
+         </div>
+      </div>
+      
+      <style>{`
+        @keyframes dash {
+          to { stroke-dashoffset: 0; }
+        }
+      `}</style>
+    </div>
+  );
+}
