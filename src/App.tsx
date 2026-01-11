@@ -104,6 +104,7 @@ function App() {
   const [isScrambling, setIsScrambling] = useState(false);
   const [activeMove, setActiveMove] = useState<MoveData | undefined>(undefined);
   const [showKeypad, setShowKeypad] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [toastMsg, setToastMessage] = useState<string | null>(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
@@ -274,10 +275,19 @@ function App() {
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-xs font-bold shadow-lg">3x3</div>
           <h1 className="text-lg font-bold tracking-tight">Rubik's Animator</h1>
         </div>
-        {/* Status Indicator in Header */}
-        <div className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${statusColor}`}>
-            {isBusy && <div className="w-2 h-2 rounded-full bg-current animate-ping"></div>}
-            {statusText}
+        {/* Status Indicator & Help in Header */}
+        <div className="flex items-center gap-4">
+            <div className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${statusColor}`}>
+                {isBusy && <div className="w-2 h-2 rounded-full bg-current animate-ping"></div>}
+                {statusText}
+            </div>
+            <button 
+                onClick={() => setShowAbout(true)}
+                className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors"
+                aria-label="Help"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+            </button>
         </div>
       </header>
       
@@ -430,6 +440,8 @@ function App() {
             </button>
         </div>
       </div>
+      
+      <About isOpen={showAbout} onClose={() => setShowAbout(false)} />
     </div>
   );
 }
