@@ -9,6 +9,7 @@ import { VisualCube } from './components/Cube';
 import { solve } from './logic/solver';
 import { useCubeSound } from './hooks/useCubeSound';
 import { ManualControls } from './components/ManualControls';
+import { About } from './components/About';
 import { Toast } from './components/Toast';
 
 // Component to handle responsive camera adjustments without remounting the Canvas
