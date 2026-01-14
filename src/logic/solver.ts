@@ -1,7 +1,7 @@
 import { getSolverString, type CubeState } from './cube3d';
 
 export async function solve(state: CubeState): Promise<string[]> {
-  const cubeString = getSolverString(state);
+  const cubeString = getSolverString(state).toLowerCase();
   // console.log("Solver String:", cubeString); // Debugging
   
   try {

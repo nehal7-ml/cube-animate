@@ -120,8 +120,8 @@ export function applyMove(state: CubeState, move: string): CubeState {
 }
 
 export function getSolverString(state: CubeState): string {
-    const getFaceColors = (face: FaceName): string => {
-      const colors: string[] = [];
+    const getFaceColors = (face: FaceName): Color[] => {
+      const colors: Color[] = [];
       let start: THREE.Vector3, rowDir: THREE.Vector3, colDir: THREE.Vector3;
       let faceNormal: THREE.Vector3;
 
@@ -171,9 +171,9 @@ export function getSolverString(state: CubeState): string {
             .addScaledVector(rowDir, r)
             .addScaledVector(colDir, c);
           
-          const cubie = state.cubies.find(c => c.position.distanceToSquared(targetPos) < 0.1);
+          const cubie = state.cubies.find(cubie => cubie.position.distanceToSquared(targetPos) < 0.1);
           if (!cubie) {
-              colors.push('x');
+              // Should not happen for a valid cube
               continue;
           }
 
@@ -186,30 +186,31 @@ export function getSolverString(state: CubeState): string {
           else if (localNormal.z > 0.9) color = cubie.materials[4];
           else if (localNormal.z < -0.9) color = cubie.materials[5];
           
-          colors.push(color ? mapColorToCode(color) : 'x');
+          if (color) colors.push(color);
         }
       }
-      return colors.join('');
+      return colors;
     };
 
-    return getFaceColors('F') +
-       getFaceColors('R') +
-       getFaceColors('U') +
-       getFaceColors('D') +
-       getFaceColors('L') +
-       getFaceColors('B');
-}
+    // Get color of center for each face to build mapping
+    const centers: Record<string, Color> = {
+        U: getFaceColors('U')[4],
+        R: getFaceColors('R')[4],
+        F: getFaceColors('F')[4],
+        D: getFaceColors('D')[4],
+        L: getFaceColors('L')[4],
+        B: getFaceColors('B')[4],
+    };
 
-function mapColorToCode(c: Color): string {
-    switch(c) {
-        case 'green': return 'f';
-        case 'red': return 'r';
-        case 'white': return 'u';
-        case 'yellow': return 'd';
-        case 'orange': return 'l';
-        case 'blue': return 'b';
-        default: return 'x';
-    }
+    const colorToCode: Record<string, string> = {};
+    Object.entries(centers).forEach(([face, color]) => {
+        colorToCode[color] = face;
+    });
+
+    const mapFace = (face: FaceName) => getFaceColors(face).map(c => colorToCode[c] || 'X').join('');
+
+    // Standard Solver Order: U R F D L B
+    return mapFace('U') + mapFace('R') + mapFace('F') + mapFace('D') + mapFace('L') + mapFace('B');
 }
 
 export function generateScramble3D(): string[] {
