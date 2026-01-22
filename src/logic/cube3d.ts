@@ -209,8 +209,8 @@ export function getSolverString(state: CubeState): string {
 
     const mapFace = (face: FaceName) => getFaceColors(face).map(c => colorToCode[c] || 'X').join('');
 
-    // Standard Solver Order: U R F D L B
-    return mapFace('U') + mapFace('R') + mapFace('F') + mapFace('D') + mapFace('L') + mapFace('B');
+    // Standard Solver Order: F R U D L B
+    return mapFace('F') + mapFace('R') + mapFace('U') + mapFace('D') + mapFace('L') + mapFace('B');
 }
 
 export function generateScramble3D(): string[] {
