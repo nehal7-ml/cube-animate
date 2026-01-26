@@ -118,10 +118,15 @@
     mask-image: linear-gradient(to right, black 80%, transparent 100%);
 }
 
-.mask-bidirectional-fade {
-    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+/* Hide scrollbar for cleaner look */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;
+.mask-bidirectional-fade {
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
 }

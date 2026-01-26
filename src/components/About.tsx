@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { MiniCube } from './MiniCube';
 
 interface Props {
   onClose: () => void;
@@ -56,32 +57,32 @@ export function About({ onClose, isOpen }: Props) {
           <section>
             <h3 className="text-neon-cyan font-bold mb-2 text-glow-cyan">How to Use</h3>
             <ul className="text-sm space-y-3">
-              <li className="flex gap-3">
-                <span className="bg-vegas-black border border-neon-orange p-1 rounded h-fit text-neon-orange box-glow-orange">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12h20"/><path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/><path d="m4 8 16-4"/><path d="m2 8 2 16"/><path d="m22 8-2 16"/></svg>
-                </span>
+              <li className="flex gap-3 items-center">
+                <div className="bg-vegas-black border border-neon-orange rounded h-fit">
+                    <MiniCube type="scramble" className="w-8 h-8" />
+                </div>
                 <div>
                     <strong className="text-neon-orange">Scramble:</strong> Randomizes the cube state to start a new puzzle.
                 </div>
               </li>
-              <li className="flex gap-3">
-                <span className="bg-vegas-black border border-neon-green p-1 rounded h-fit text-neon-green box-glow-green">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m7.8 16.2-2.9 2.9"/><path d="M6 12H2"/><path d="m7.8 7.8-2.9-2.9"/><circle cx="12" cy="12" r="3"/></svg>
-                </span>
+              <li className="flex gap-3 items-center">
+                <div className="bg-vegas-black border border-neon-green rounded h-fit">
+                    <MiniCube type="solve" className="w-8 h-8" />
+                </div>
                 <div>
                     <strong className="text-neon-green">Solve:</strong> Automatically calculates and animates the solution step-by-step.
                 </div>
               </li>
-              <li className="flex gap-3">
-                <span className="bg-vegas-black border border-neon-purple p-1 rounded h-fit text-neon-purple box-glow-pink">
-                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                </span>
+              <li className="flex gap-3 items-center">
+                <div className="bg-vegas-black border border-neon-purple rounded h-fit">
+                   <MiniCube type="manual" className="w-8 h-8" />
+                </div>
                 <div>
-                    <strong className="text-neon-purple">Manual Control:</strong> Opens a keypad to perform specific face rotations (U, D, L, R, F, B).
+                    <strong className="text-neon-purple">Manual Control:</strong> Opens a keypad to perform specific face rotations.
                 </div>
               </li>
-              <li className="flex gap-3">
-                <span className="bg-vegas-black border border-neon-cyan p-1 rounded h-fit text-neon-cyan box-glow-cyan">
+              <li className="flex gap-3 items-center">
+                <span className="bg-vegas-black border border-neon-cyan p-2 rounded h-fit text-neon-cyan box-glow-cyan">
                     🖱️
                 </span>
                 <div>
@@ -93,7 +94,7 @@ export function About({ onClose, isOpen }: Props) {
 
           <div className="pt-4 border-t border-neon-purple/30 flex items-center justify-center">
              <div className="bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan text-transparent bg-clip-text font-bold text-sm flex items-center gap-2 animate-pulse">
-                <span className="text-lg">✨</span> Vibe coded with Code Assist Gemini 3
+                <span className="text-lg">✨</span> Vibe coded with Gemini 2.0 Flash
              </div>
           </div>
 

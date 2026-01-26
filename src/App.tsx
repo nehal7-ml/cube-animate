@@ -11,10 +11,7 @@ import { useCubeSound } from './hooks/useCubeSound';
 import { ManualControls } from './components/ManualControls';
 import { About } from './components/About';
 import { Toast } from './components/Toast';
-
-// SVG Assets
-import ScrambleIcon from './assets/cube_of_rubik_1.svg';
-import SolveIcon from './assets/kubas.svg';
+import { MiniCube } from './components/MiniCube';
 
 // Component to handle responsive camera adjustments without remounting the Canvas
 function ResponsiveCamera({ isMobile, isKeypadOpen }: { isMobile: boolean; isKeypadOpen: boolean }) {
@@ -450,28 +447,28 @@ function App() {
             <button 
                 onClick={handleScramble} 
                 disabled={isBusy}
-                className="flex-1 py-4 bg-transparent border border-neon-orange text-neon-orange font-bold rounded-xl hover:bg-neon-orange hover:text-black hover:box-glow-orange transition-all active:scale-95 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-neon-orange disabled:hover:shadow-none flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(255,170,0,0.2)] group"
+                className="flex-1 py-4 bg-transparent border border-neon-orange text-neon-orange font-bold rounded-xl hover:bg-neon-orange hover:text-black hover:box-glow-orange transition-all active:scale-95 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-neon-orange disabled:hover:shadow-none flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(255,170,0,0.2)]"
             >
-                <img src={ScrambleIcon} alt="" className="w-6 h-6 invert group-hover:brightness-0" />
-                SCRAMBLE
+                <MiniCube type="scramble" className="w-8 h-8 pointer-events-none" />
+                <span className="hidden md:inline">SCRAMBLE</span>
             </button>
 
             <button 
                 onClick={() => setShowKeypad(!showKeypad)}
                 disabled={isBusy}
-                className={`p-4 rounded-xl transition-all active:scale-95 disabled:opacity-50 border ${showKeypad ? 'bg-neon-purple text-white border-neon-purple box-glow-pink' : 'bg-transparent text-neon-purple border-neon-purple hover:bg-neon-purple hover:text-white hover:box-glow-pink'}`}
+                className={`p-4 rounded-xl transition-all active:scale-95 disabled:opacity-50 border flex items-center justify-center ${showKeypad ? 'bg-neon-purple text-white border-neon-purple box-glow-pink' : 'bg-transparent text-neon-purple border-neon-purple hover:bg-neon-purple hover:text-white hover:box-glow-pink'}`}
                 aria-label="Manual Controls"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <MiniCube type="manual" className="w-8 h-8 pointer-events-none" />
             </button>
 
             <button 
                 onClick={handleSolve} 
                 disabled={isBusy}
-                className="flex-[1.5] py-4 bg-transparent border border-neon-green text-neon-green font-bold rounded-xl hover:bg-neon-green hover:text-black hover:box-glow-green transition-all active:scale-95 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-neon-green disabled:hover:shadow-none flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(0,255,0,0.2)] group"
+                className="flex-[1.5] py-4 bg-transparent border border-neon-green text-neon-green font-bold rounded-xl hover:bg-neon-green hover:text-black hover:box-glow-green transition-all active:scale-95 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-neon-green disabled:hover:shadow-none flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(0,255,0,0.2)]"
             >
-                <img src={SolveIcon} alt="" className="w-6 h-6 invert group-hover:brightness-0" />
-                SOLVE
+                <MiniCube type="solve" className="w-8 h-8 pointer-events-none" />
+                <span className="hidden md:inline">SOLVE</span>
             </button>
         </div>
       </div>
