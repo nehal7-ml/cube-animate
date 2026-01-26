@@ -1,1 +1,127 @@
 @import "tailwindcss";
+
+:root {
+  --neon-pink: #ff00ff;
+  --neon-cyan: #00ffff;
+  --neon-green: #00ff00;
+  --neon-purple: #bf00ff;
+  --neon-yellow: #ffff00;
+  --neon-orange: #ffaa00;
+  --vegas-black: #050510;
+  --vegas-dark: #0a0a15;
+}
+
+@theme {
+  --color-neon-pink: var(--neon-pink);
+  --color-neon-cyan: var(--neon-cyan);
+  --color-neon-green: var(--neon-green);
+  --color-neon-purple: var(--neon-purple);
+  --color-neon-yellow: var(--neon-yellow);
+  --color-neon-orange: var(--neon-orange);
+  --color-vegas-black: var(--vegas-black);
+  --color-vegas-dark: var(--vegas-dark);
+
+  --animate-gradient-x: gradient-x 15s ease infinite;
+  --animate-neon-pulse: neon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-flicker: flicker 3s infinite alternate;
+  
+  --keyframes-gradient-x: {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  };
+
+  --keyframes-neon-pulse: {
+    0%, 100% { opacity: 1; filter: brightness(100%); }
+    50% { opacity: .8; filter: brightness(150%); }
+  };
+  
+  --keyframes-flicker: {
+    0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
+    20%, 24%, 55% { opacity: 0.4; }
+  };
+}
+
+/* Custom Utilities for Neon Effects */
+/* Text glow utilities retained but will be removed from specific elements as requested */
+.text-glow-pink {
+  text-shadow: 0 0 5px var(--neon-pink);
+}
+.text-glow-cyan {
+  text-shadow: 0 0 5px var(--neon-cyan);
+}
+.text-glow-green {
+  text-shadow: 0 0 5px var(--neon-green);
+}
+.text-glow-yellow {
+  text-shadow: 0 0 5px var(--neon-yellow);
+}
+
+.box-glow-pink {
+  box-shadow: 0 0 5px var(--neon-pink), 0 0 10px var(--neon-pink) inset;
+}
+.box-glow-cyan {
+  box-shadow: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan) inset;
+}
+.box-glow-orange {
+  box-shadow: 0 0 5px var(--neon-orange), 0 0 10px var(--neon-orange) inset;
+}
+.box-glow-green {
+  box-shadow: 0 0 5px var(--neon-green), 0 0 10px var(--neon-green) inset;
+}
+.box-glow-yellow {
+  box-shadow: 0 0 5px var(--neon-yellow), 0 0 10px var(--neon-yellow) inset;
+}
+
+/* Dynamic Neon Borders - Subtle by default, intense on hover */
+.neon-border-pink {
+  border: 1px solid var(--neon-pink);
+  box-shadow: 0 0 2px var(--neon-pink);
+  transition: all 0.3s ease;
+}
+.neon-border-pink:hover {
+  box-shadow: 0 0 15px var(--neon-pink), inset 0 0 5px var(--neon-pink);
+}
+
+.neon-border-cyan {
+  border: 1px solid var(--neon-cyan);
+  box-shadow: 0 0 2px var(--neon-cyan);
+  transition: all 0.3s ease;
+}
+.neon-border-cyan:hover {
+  box-shadow: 0 0 15px var(--neon-cyan), inset 0 0 5px var(--neon-cyan);
+}
+
+.neon-border-green {
+  border: 1px solid var(--neon-green);
+  box-shadow: 0 0 2px var(--neon-green);
+  transition: all 0.3s ease;
+}
+.neon-border-green:hover {
+  box-shadow: 0 0 15px var(--neon-green), inset 0 0 5px var(--neon-green);
+}
+
+.neon-border-yellow {
+  border: 1px solid var(--neon-yellow);
+  box-shadow: 0 0 2px var(--neon-yellow);
+  transition: all 0.3s ease;
+}
+.neon-border-yellow:hover {
+  box-shadow: 0 0 15px var(--neon-yellow), inset 0 0 5px var(--neon-yellow);
+}
+
+.bg-vegas-gradient {
+  background: linear-gradient(-45deg, #050510, #1a0b2e, #0f1c30, #050510);
+  background-size: 400% 400%;
+}
+
+.mask-linear-fade {
+    mask-image: linear-gradient(to right, black 80%, transparent 100%);
+}
+
+.mask-bidirectional-fade {
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}

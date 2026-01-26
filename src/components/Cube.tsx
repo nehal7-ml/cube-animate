@@ -4,31 +4,31 @@ import { RoundedBox } from '@react-three/drei';
 import * as THREE from 'three';
 import { type CubeState, type Color, type Cubie } from '../logic/cube3d';
 
-// Glossy Sticker Materials - Brighter & More Vibrant
+// Glossy Sticker Materials - Brighter & More Vibrant (Neon Tuned)
 const stickerMaterials: Record<Color, THREE.Material> = {
   white: new THREE.MeshPhysicalMaterial({ 
-    color: '#ffffff', emissive: '#444444', roughness: 0.02, metalness: 0.1, clearcoat: 1.0, clearcoatRoughness: 0.02 
+    color: '#ffffff', emissive: '#888888', roughness: 0.02, metalness: 0.1, clearcoat: 1.0, clearcoatRoughness: 0.02 
   }),
   yellow: new THREE.MeshPhysicalMaterial({ 
-    color: '#ffff00', emissive: '#444400', roughness: 0.02, metalness: 0.1, clearcoat: 1.0, clearcoatRoughness: 0.02 
+    color: '#ffff00', emissive: '#888800', roughness: 0.02, metalness: 0.1, clearcoat: 1.0, clearcoatRoughness: 0.02 
   }),
   orange: new THREE.MeshPhysicalMaterial({ 
-    color: '#ff8800', emissive: '#442200', roughness: 0.02, metalness: 0.1, clearcoat: 1.0, clearcoatRoughness: 0.02 
+    color: '#ff8800', emissive: '#884400', roughness: 0.02, metalness: 0.1, clearcoat: 1.0, clearcoatRoughness: 0.02 
   }),
   red: new THREE.MeshPhysicalMaterial({ 
-    color: '#ff0000', emissive: '#440000', roughness: 0.02, metalness: 0.1, clearcoat: 1.0, clearcoatRoughness: 0.02 
+    color: '#ff0000', emissive: '#880000', roughness: 0.02, metalness: 0.1, clearcoat: 1.0, clearcoatRoughness: 0.02 
   }),
   green: new THREE.MeshPhysicalMaterial({ 
-    color: '#00ff00', emissive: '#004400', roughness: 0.02, metalness: 0.1, clearcoat: 1.0, clearcoatRoughness: 0.02 
+    color: '#00ff00', emissive: '#008800', roughness: 0.02, metalness: 0.1, clearcoat: 1.0, clearcoatRoughness: 0.02 
   }),
   blue: new THREE.MeshPhysicalMaterial({ 
-    color: '#0088ff', emissive: '#002244', roughness: 0.02, metalness: 0.1, clearcoat: 1.0, clearcoatRoughness: 0.02 
+    color: '#0088ff', emissive: '#004488', roughness: 0.02, metalness: 0.1, clearcoat: 1.0, clearcoatRoughness: 0.02 
   }),
 };
 
-// Matte Black Plastic
+// Matte Black Plastic (Slightly glossier for neon reflections)
 const blackMaterial = new THREE.MeshStandardMaterial({ 
-  color: '#1a1a1a', roughness: 0.6, metalness: 0.1 
+  color: '#1a1a1a', roughness: 0.4, metalness: 0.2 
 });
 
 interface Props {

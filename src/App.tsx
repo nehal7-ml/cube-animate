@@ -12,6 +12,10 @@ import { ManualControls } from './components/ManualControls';
 import { About } from './components/About';
 import { Toast } from './components/Toast';
 
+// SVG Assets
+import ScrambleIcon from './assets/cube_of_rubik_1.svg';
+import SolveIcon from './assets/kubas.svg';
+
 // Component to handle responsive camera adjustments without remounting the Canvas
 function ResponsiveCamera({ isMobile, isKeypadOpen }: { isMobile: boolean; isKeypadOpen: boolean }) {
   const { camera } = useThree();
@@ -94,12 +98,14 @@ function expandMoves(moves: string[]): string[] {
 interface MoveData {
   move: string;
   source: 'user' | 'scramble' | 'solution';
+  index?: number; // Added to fix highlighting logic
 }
 
 function App() {
   const [cube, setCube] = useState<CubeState>(createCube());
   const [pastMoves, setPastMoves] = useState<MoveData[]>([]); 
   const [futureMoves, setFutureMoves] = useState<MoveData[]>([]); 
+  const [solutionToDisplay, setSolutionToDisplay] = useState<MoveData[]>([]); 
   const [isSolving, setIsSolving] = useState(false); 
   const [isScrambling, setIsScrambling] = useState(false);
   const [activeMove, setActiveMove] = useState<MoveData | undefined>(undefined);
@@ -108,6 +114,25 @@ function App() {
   const [toastMsg, setToastMessage] = useState<string | null>(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
+  // Refs for scrolling logic
+  const historyScrollRef = useRef<HTMLDivElement>(null);
+  const solutionScrollRef = useRef<HTMLDivElement>(null);
+  const activeHistoryRef = useRef<HTMLSpanElement>(null);
+  const activeSolutionRef = useRef<HTMLSpanElement>(null);
+
+  // Auto-centering scroll logic
+  useEffect(() => {
+    if (activeHistoryRef.current) {
+        activeHistoryRef.current.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [activeMove, pastMoves]);
+
+  useEffect(() => {
+    if (activeSolutionRef.current) {
+        activeSolutionRef.current.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [activeMove, solutionToDisplay]);
+
   // Draggable Manual Controls State (Imperative for performance)
   const manualControlsRef = useRef<HTMLDivElement>(null);
   // Store the *accumulated* offset here (persisted position)
@@ -142,7 +167,6 @@ function App() {
   });
 
   const playSound = useCubeSound();
-  const timelineScrollRef = useRef<HTMLDivElement>(null);
 
   // Responsive window resize handling
   useEffect(() => {
@@ -154,16 +178,6 @@ function App() {
   // SEO Info
   const appTitle = "Rubik's Cube Solver & Animator";
   const appDescription = "Interactive 3D Rubik's Cube simulator with CFOP solver, realistic animations, and mechanical sound effects.";
-
-  // Scroll logic: Keep active move visible
-  useEffect(() => {
-    if (timelineScrollRef.current) {
-        const container = timelineScrollRef.current;
-        if (activeMove || pastMoves.length > 0) {
-             container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
-        }
-    }
-  }, [pastMoves, activeMove]);
 
   // Animation Loop
   useEffect(() => {
@@ -199,6 +213,7 @@ function App() {
     const moves = generateScramble3D();
     const expanded = expandMoves(moves);
     setPastMoves([]);
+    setSolutionToDisplay([]); 
     setFutureMoves(expanded.map(move => ({ move, source: 'scramble' })));
     setIsSolving(false);
     setIsScrambling(true);
@@ -207,6 +222,7 @@ function App() {
   const handleReset = () => {
     setPastMoves([]);
     setFutureMoves([]);
+    setSolutionToDisplay([]); 
     setIsSolving(false);
     setIsScrambling(false);
     setActiveMove(undefined);
@@ -217,9 +233,6 @@ function App() {
   const handleSolve = async () => {
     if (activeMove || futureMoves.length > 0) return;
     
-    // Set a temporary loading state or toast if needed, 
-    // but the button is disabled while isBusy, which covers it?
-    // Not exactly, we need to show we are "calculating".
     setToastMessage("Calculating solution...");
     
     try {
@@ -229,7 +242,9 @@ function App() {
           return;
         }
         const expanded = expandMoves(rawSolution);
-        setFutureMoves(expanded.map(move => ({ move, source: 'solution' })));
+        const solutionMoves = expanded.map((move, i) => ({ move, source: 'solution', index: i } as MoveData));
+        setFutureMoves(solutionMoves);
+        setSolutionToDisplay(solutionMoves); 
         setIsSolving(true);
         setIsScrambling(false);
         setToastMessage(null); // Clear calculating message
@@ -242,23 +257,23 @@ function App() {
 
   // Determine Status Text
   let statusText = "Ready";
-  let statusColor = "text-slate-500";
+  let statusColor = "text-slate-400";
   
   if (isScrambling) {
       statusText = "Scrambling...";
-      statusColor = "text-yellow-500";
+      statusColor = "text-neon-yellow animate-pulse";
   } else if (isSolving) {
       statusText = "Solving...";
-      statusColor = "text-green-500";
+      statusColor = "text-neon-green animate-pulse";
   } else if (isBusy) {
       statusText = "Animating...";
-      statusColor = "text-blue-400";
+      statusColor = "text-neon-cyan";
   }
 
   const isMobile = windowWidth < 768;
 
   return (
-    <div className="h-[100dvh] w-full bg-slate-800 flex flex-col overflow-hidden font-sans text-slate-100">
+    <div className="h-[100dvh] w-full bg-vegas-gradient animate-gradient-x flex flex-col overflow-hidden font-sans text-slate-100">
       <Helmet>
         <title>{appTitle}</title>
         <meta name="description" content={appDescription} />
@@ -270,10 +285,10 @@ function App() {
       <Toast message={toastMsg} onClose={() => setToastMessage(null)} />
 
       {/* Header */}
-      <header className="p-4 flex justify-between items-center bg-slate-900/80 backdrop-blur border-b border-slate-800 shrink-0 z-20">
+      <header className="p-4 flex justify-between items-center bg-vegas-black/80 backdrop-blur border-b border-neon-pink/30 shrink-0 z-20 shadow-lg shadow-neon-pink/10">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-xs font-bold shadow-lg">3x3</div>
-          <h1 className="text-lg font-bold tracking-tight">Rubik's Animator</h1>
+          <div className="w-8 h-8 bg-gradient-to-br from-neon-purple to-neon-pink rounded-lg flex items-center justify-center text-xs font-bold shadow-neon-pink text-white">3x3</div>
+          <h1 className="text-lg font-bold tracking-tight text-white">Rubik's Animator</h1>
         </div>
         {/* Status Indicator & Help in Header */}
         <div className="flex items-center gap-4">
@@ -283,7 +298,7 @@ function App() {
             </div>
             <button 
                 onClick={() => setShowAbout(true)}
-                className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors"
+                className="p-2 text-slate-400 hover:text-neon-cyan hover:bg-neon-cyan/10 rounded-full transition-colors"
                 aria-label="Help"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
@@ -300,16 +315,17 @@ function App() {
             style={{ touchAction: 'none' }}
           >
             <ResponsiveCamera isMobile={isMobile} isKeypadOpen={showKeypad} />
-            <ambientLight intensity={1.5} />
+            <ambientLight intensity={0.4} />
+            <pointLight position={[10, 10, 10]} intensity={1.5} color="#ff00ff" distance={30} />
+            <pointLight position={[-10, 5, 10]} intensity={1.5} color="#00ffff" distance={30} />
+            
             <directionalLight 
-              position={[10, 20, 10]} 
-              intensity={2} 
+              position={[5, 10, 5]} 
+              intensity={1} 
               castShadow 
               shadow-mapSize={[2048, 2048]}
               shadow-bias={-0.001}
             />
-            <directionalLight position={[-10, -10, -5]} intensity={0.5} />
-            <pointLight position={[0, 5, 0]} intensity={1} distance={10} />
             
             <PresentationControls
               global={false}
@@ -328,7 +344,7 @@ function App() {
               scale={20} 
               blur={2.5} 
               far={4.5} 
-              color="#000000"
+              color="#050510"
             />
           </Canvas>
 
@@ -337,21 +353,29 @@ function App() {
              
              {/* Box 1: History */}
              {(pastMoves.length > 0 || (activeMove && !isSolving)) && (
-                <div className="flex-1 max-w-md bg-black/60 backdrop-blur p-4 rounded-lg border border-slate-700 pointer-events-auto shadow-lg">
-                    <div className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">History / Scramble</div>
+                <div className="flex-1 max-w-md bg-vegas-dark/90 backdrop-blur p-4 rounded-lg neon-border-pink pointer-events-auto shadow-lg transition-all duration-300 hover:scale-[1.02]">
+                    <div className="text-neon-pink text-xs font-bold uppercase tracking-wider mb-2 px-2">History / Scramble</div>
                     <div 
-                        ref={timelineScrollRef}
-                        className="flex overflow-x-auto gap-1 py-1 scrollbar-hide mask-linear-fade"
+                        ref={historyScrollRef}
+                        className="flex overflow-x-auto gap-2 py-2 scrollbar-thin scrollbar-thumb-neon-pink scrollbar-track-transparent mask-bidirectional-fade"
+                        style={{ paddingLeft: '45%', paddingRight: '45%' }}
                     >
                         {pastMoves.map((m, i) => (
-                            <span key={`past-${i}`} className={`shrink-0 px-2 py-1 rounded text-xs font-mono border ${
-                                m.source === 'solution' ? 'bg-green-900/30 text-green-400 border-green-800' : 'bg-slate-800 text-slate-400 border-transparent'
-                            }`}>
+                            <span 
+                                key={`past-${i}`} 
+                                ref={i === pastMoves.length - 1 && (!activeMove || isSolving) ? activeHistoryRef : null}
+                                className={`shrink-0 px-3 py-1.5 rounded text-sm font-bold font-mono border transition-colors ${
+                                    m.source === 'solution' ? 'bg-green-900/30 text-neon-green border-green-800' : 'bg-vegas-black text-slate-200 border-neon-pink/20 hover:border-neon-pink/60'
+                                }`}
+                            >
                                 {m.move}
                             </span>
                         ))}
                         {activeMove && !isSolving && (
-                            <span className="shrink-0 px-2 py-1 bg-yellow-500 text-black rounded text-xs font-mono font-bold animate-pulse">
+                            <span 
+                                ref={activeHistoryRef}
+                                className="shrink-0 px-3 py-1.5 bg-neon-yellow text-black rounded text-sm font-mono font-bold animate-pulse box-glow-yellow border border-neon-yellow"
+                            >
                                 {activeMove.move}
                             </span>
                         )}
@@ -359,24 +383,35 @@ function App() {
                 </div>
              )}
 
-             {/* Box 2: CFOP Solution */}
-             {(isSolving || (futureMoves.length > 0 && isSolving)) && (
-               <div className="flex-1 max-w-md bg-green-900/40 backdrop-blur p-4 rounded-lg border border-green-500/30 pointer-events-auto shadow-lg">
-                 <div className="text-green-400 text-xs font-bold uppercase tracking-wider mb-2 flex justify-between">
+             {/* Box 2: CFOP Solution (Persistent) */}
+             {(solutionToDisplay.length > 0) && (
+               <div className="flex-1 max-w-md bg-vegas-dark/90 backdrop-blur p-4 rounded-lg neon-border-green pointer-events-auto shadow-lg transition-all duration-300 hover:scale-[1.02]">
+                 <div className="text-neon-green text-xs font-bold uppercase tracking-wider mb-2 flex justify-between px-2">
                     <span>CFOP Solution</span>
-                    <span>{futureMoves.length} left</span>
+                    <span>{solutionToDisplay.length} steps</span>
                  </div>
-                 <div className="flex overflow-x-auto gap-2 py-1 scrollbar-hide">
-                   {activeMove && isSolving && (
-                     <span className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-yellow-500 text-black rounded font-mono font-bold text-sm scale-110 shadow-glow">
-                       {activeMove.move}
-                     </span>
-                   )}
-                   {futureMoves.map((m, i) => (
-                     <span key={`future-${i}`} className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-slate-800 text-slate-300 rounded font-mono text-sm border border-slate-700">
-                       {m.move}
-                     </span>
-                   ))}
+                 <div 
+                    ref={solutionScrollRef}
+                    className="flex overflow-x-auto gap-2 py-2 scrollbar-thin scrollbar-thumb-neon-green scrollbar-track-transparent mask-bidirectional-fade"
+                    style={{ paddingLeft: '45%', paddingRight: '45%' }}
+                 >
+                   {solutionToDisplay.map((m, i) => {
+                       const isCurrent = activeMove?.source === 'solution' && activeMove?.index === i;
+
+                       return (
+                         <span 
+                            key={`sol-${i}`} 
+                            ref={isCurrent ? activeSolutionRef : null}
+                            className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded font-mono font-bold text-sm border transition-all ${
+                                isCurrent 
+                                    ? 'bg-neon-yellow text-black box-glow-yellow border-neon-yellow scale-110 z-10'
+                                    : 'bg-vegas-black text-neon-green border-neon-green/30 opacity-80'
+                            }`}
+                         >
+                           {m.move}
+                         </span>
+                       );
+                   })}
                  </div>
                </div>
              )}
@@ -392,7 +427,7 @@ function App() {
                 <ManualControls 
                     onMove={handleMove} 
                     onClose={() => setShowKeypad(false)} 
-                    className="w-full md:w-80 lg:w-[480px] shadow-2xl rounded-t-2xl md:rounded-2xl border-t md:border border-slate-700"
+                    className="w-full md:w-80 lg:w-[480px] shadow-2xl rounded-t-2xl md:rounded-2xl border-t md:border neon-border-cyan bg-vegas-dark/95"
                     extraHeaderProps={!isMobile ? bindDrag() : {}}
                 />
             </div>
@@ -400,13 +435,13 @@ function App() {
       </div>
 
       {/* Bottom Panel */}
-      <div className="bg-slate-900 border-t border-slate-800 flex flex-col shrink-0 z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
+      <div className="bg-vegas-black border-t border-neon-cyan/20 flex flex-col shrink-0 z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
         {/* Main Controls */}
         <div className="p-4 pb-6 safe-area-bottom flex gap-4 items-center justify-center">
             <button 
                 onClick={handleReset} 
                 disabled={isBusy}
-                className="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all active:scale-95 disabled:opacity-50"
+                className="p-4 rounded-xl bg-transparent border border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-black hover:box-glow-cyan transition-all active:scale-95 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-neon-cyan disabled:hover:shadow-none"
                 aria-label="Reset"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
@@ -415,16 +450,16 @@ function App() {
             <button 
                 onClick={handleScramble} 
                 disabled={isBusy}
-                className="flex-1 py-4 bg-slate-800 hover:bg-slate-700 text-yellow-500 font-bold rounded-xl shadow-lg transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 py-4 bg-transparent border border-neon-orange text-neon-orange font-bold rounded-xl hover:bg-neon-orange hover:text-black hover:box-glow-orange transition-all active:scale-95 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-neon-orange disabled:hover:shadow-none flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(255,170,0,0.2)] group"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12h20"/><path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/><path d="m4 8 16-4"/><path d="m2 8 2 16"/><path d="m22 8-2 16"/></svg>
+                <img src={ScrambleIcon} alt="" className="w-6 h-6 invert group-hover:brightness-0" />
                 SCRAMBLE
             </button>
 
             <button 
                 onClick={() => setShowKeypad(!showKeypad)}
                 disabled={isBusy}
-                className={`p-4 rounded-xl transition-all active:scale-95 disabled:opacity-50 ${showKeypad ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.5)]' : 'bg-slate-800 hover:bg-slate-700 text-blue-400'}`}
+                className={`p-4 rounded-xl transition-all active:scale-95 disabled:opacity-50 border ${showKeypad ? 'bg-neon-purple text-white border-neon-purple box-glow-pink' : 'bg-transparent text-neon-purple border-neon-purple hover:bg-neon-purple hover:text-white hover:box-glow-pink'}`}
                 aria-label="Manual Controls"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
@@ -433,9 +468,9 @@ function App() {
             <button 
                 onClick={handleSolve} 
                 disabled={isBusy}
-                className="flex-[1.5] py-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-[1.5] py-4 bg-transparent border border-neon-green text-neon-green font-bold rounded-xl hover:bg-neon-green hover:text-black hover:box-glow-green transition-all active:scale-95 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-neon-green disabled:hover:shadow-none flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(0,255,0,0.2)] group"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m7.8 16.2-2.9 2.9"/><path d="M6 12H2"/><path d="m7.8 7.8-2.9-2.9"/><circle cx="12" cy="12" r="3"/></svg>
+                <img src={SolveIcon} alt="" className="w-6 h-6 invert group-hover:brightness-0" />
                 SOLVE
             </button>
         </div>

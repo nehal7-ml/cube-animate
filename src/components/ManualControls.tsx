@@ -64,13 +64,15 @@ const LongPressButton = ({ move, onMove }: { move: string, onMove: (m: string) =
       onPointerCancel={cancel}
       className={`
         relative w-full aspect-square rounded-xl font-bold text-xl lg:text-3xl transition-all duration-200 select-none
-        flex items-center justify-center shadow-lg cursor-pointer active:scale-95
+        flex items-center justify-center shadow-lg cursor-pointer active:scale-95 border
         ${isPressed 
-            ? (isPrime ? 'bg-red-600 text-white shadow-red-500/50 scale-95' : 'bg-blue-500 text-white scale-95') 
-            : 'bg-slate-700 text-slate-200 hover:bg-slate-600'}
+            ? (isPrime 
+                ? 'bg-neon-pink text-white border-neon-pink box-glow-pink scale-95' 
+                : 'bg-neon-cyan text-black border-neon-cyan box-glow-cyan scale-95') 
+            : 'bg-vegas-black text-neon-cyan border-neon-cyan/50 hover:bg-neon-cyan/10 hover:border-neon-cyan hover:box-glow-cyan hover:text-white'}
       `}
     >
-      <span className="relative z-10">{move}{isPrime ? "'" : ""}</span>
+      <span className="relative z-10 drop-shadow-md">{move}{isPrime ? "'" : ""}</span>
       
       {/* Progress Indicator for Long Press */}
       {isPressed && !isPrime && (
@@ -93,7 +95,7 @@ const LongPressButton = ({ move, onMove }: { move: string, onMove: (m: string) =
       )}
       
       {/* Hint Text */}
-      <span className="absolute bottom-1 text-[8px] lg:text-[10px] font-mono opacity-50 uppercase tracking-wider">
+      <span className="absolute bottom-1 text-[8px] lg:text-[10px] font-mono opacity-70 uppercase tracking-wider">
         {isPrime ? "PRIME" : "HOLD"}
       </span>
     </button>
@@ -108,19 +110,18 @@ export function ManualControls({ onMove, onClose, className = "", extraHeaderPro
   ];
 
   return (
-    <div className={`bg-slate-900 border border-slate-700 shadow-2xl flex flex-col rounded-2xl ${className}`}>
+    <div className={`bg-vegas-dark/95 backdrop-blur-md flex flex-col rounded-2xl overflow-hidden neon-border-cyan transition-all duration-300 hover:scale-[1.01] ${className}`}>
       {/* Header */}
-      <div 
-        className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-850 shrink-0 cursor-move touch-none"
-        {...extraHeaderProps}
-      >
-        <div className="flex flex-col">
-          <h2 className="text-lg font-bold text-slate-100">Manual Control</h2>
-          <span className="text-xs text-slate-400">Tap for CW • Hold for Prime (')</span>
-        </div>
-        <button 
-          onClick={onClose}
-          className="p-2 bg-slate-800 hover:bg-slate-700 rounded-full transition-colors text-slate-300"
+            <div 
+              className="p-4 border-b border-neon-cyan/30 flex justify-between items-center bg-vegas-black shrink-0 cursor-move touch-none"
+              {...extraHeaderProps}
+            >
+              <div className="flex flex-col">
+                <h2 className="text-lg font-bold text-neon-cyan">Manual Control</h2>
+                <span className="text-xs text-slate-400">Tap for CW • Hold for Prime (')</span>
+              </div>
+              <button            onClick={onClose}
+          className="p-2 bg-transparent hover:bg-neon-pink/20 rounded-full transition-colors text-neon-pink border border-transparent hover:border-neon-pink hover:box-glow-pink"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
