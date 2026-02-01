@@ -108,6 +108,9 @@ function App() {
   const [activeMove, setActiveMove] = useState<MoveData | undefined>(undefined);
   const [showKeypad, setShowKeypad] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [historyCollapsed, setHistoryCollapsed] = useState(false);
+  const [solutionCollapsed, setSolutionCollapsed] = useState(false);
+  const [totalScrambleMoves, setTotalScrambleMoves] = useState(0);
   const [toastMsg, setToastMessage] = useState<string | null>(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
@@ -212,6 +215,7 @@ function App() {
     setPastMoves([]);
     setSolutionToDisplay([]); 
     setFutureMoves(expanded.map(move => ({ move, source: 'scramble' })));
+    setTotalScrambleMoves(expanded.length);
     setIsSolving(false);
     setIsScrambling(true);
   };
@@ -220,6 +224,7 @@ function App() {
     setPastMoves([]);
     setFutureMoves([]);
     setSolutionToDisplay([]); 
+    setTotalScrambleMoves(0);
     setIsSolving(false);
     setIsScrambling(false);
     setActiveMove(undefined);
@@ -350,66 +355,102 @@ function App() {
              
              {/* Box 1: History */}
              {(pastMoves.length > 0 || (activeMove && !isSolving)) && (
-                <div className="flex-1 max-w-md bg-vegas-dark/90 backdrop-blur p-4 rounded-lg neon-border-pink pointer-events-auto shadow-lg transition-all duration-300 hover:scale-[1.02]">
-                    <div className="text-neon-pink text-xs font-bold uppercase tracking-wider mb-2 px-2">History / Scramble</div>
-                    <div 
-                        ref={historyScrollRef}
-                        className="flex overflow-x-auto gap-2 py-2 scrollbar-thin scrollbar-thumb-neon-pink scrollbar-track-transparent mask-bidirectional-fade"
-                        style={{ paddingLeft: '45%', paddingRight: '45%' }}
-                    >
-                        {pastMoves.map((m, i) => (
-                            <span 
-                                key={`past-${i}`} 
-                                ref={i === pastMoves.length - 1 && (!activeMove || isSolving) ? activeHistoryRef : null}
-                                className={`shrink-0 px-3 py-1.5 rounded text-sm font-bold font-mono border transition-colors ${
-                                    m.source === 'solution' ? 'bg-green-900/30 text-neon-green border-green-800' : 'bg-vegas-black text-slate-200 border-neon-pink/20 hover:border-neon-pink/60'
-                                }`}
-                            >
-                                {m.move}
-                            </span>
-                        ))}
-                        {activeMove && !isSolving && (
-                            <span 
-                                ref={activeHistoryRef}
-                                className="shrink-0 px-3 py-1.5 bg-neon-yellow text-black rounded text-sm font-mono font-bold animate-pulse box-glow-yellow border border-neon-yellow"
-                            >
-                                {activeMove.move}
-                            </span>
-                        )}
+                <div className={`transition-all duration-300 bg-vegas-dark/90 backdrop-blur rounded-lg neon-border-pink pointer-events-auto shadow-lg hover:scale-[1.02] ${historyCollapsed ? 'w-12 h-12 flex items-center justify-center p-0 self-end' : 'w-full md:max-w-md p-4'}`}>
+                    <div className={`flex justify-between items-center ${historyCollapsed ? 'w-full h-full' : 'mb-2'}`}>
+                       {!historyCollapsed && <div className="text-neon-pink text-xs font-bold uppercase tracking-wider px-2">History / Scramble</div>}
+                       <button 
+                           onClick={() => setHistoryCollapsed(!historyCollapsed)}
+                           className={`rounded-lg cursor-pointer hover:bg-neon-pink/20 text-neon-pink transition-colors ${historyCollapsed ? 'w-full h-full flex items-center justify-center' : 'p-1'}`}
+                           aria-label={historyCollapsed ? "Expand History" : "Collapse History"}
+                           title={historyCollapsed ? "Expand History" : "Collapse History"}
+                       >
+                           {historyCollapsed ? (
+                               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+                           ) : (
+                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/></svg>
+                           )}
+                       </button>
                     </div>
+                    
+                    {!historyCollapsed && (
+                        <div 
+                            ref={historyScrollRef}
+                            className="flex overflow-x-auto gap-2 py-2 scrollbar-thin scrollbar-thumb-neon-pink scrollbar-track-transparent mask-bidirectional-fade"
+                            style={{ paddingLeft: '45%', paddingRight: '45%' }}
+                        >
+                            {pastMoves.map((m, i) => (
+                                <span 
+                                    key={`past-${i}`} 
+                                    ref={i === pastMoves.length - 1 && (!activeMove || isSolving) ? activeHistoryRef : null}
+                                    className={`shrink-0 px-3 py-1.5 rounded text-sm font-bold font-mono border transition-colors ${
+                                        m.source === 'solution' ? 'bg-green-900/30 text-neon-green border-green-800' : 'bg-vegas-black text-slate-200 border-neon-pink/20 hover:border-neon-pink/60'
+                                    }`}
+                                >
+                                    {m.move}
+                                </span>
+                            ))}
+                            {activeMove && !isSolving && (
+                                <span 
+                                    ref={activeHistoryRef}
+                                    className="shrink-0 px-3 py-1.5 bg-neon-yellow text-black rounded text-sm font-mono font-bold animate-pulse box-glow-yellow border border-neon-yellow"
+                                >
+                                    {activeMove.move}
+                                </span>
+                            )}
+                        </div>
+                    )}
                 </div>
              )}
 
              {/* Box 2: CFOP Solution (Persistent) */}
              {(solutionToDisplay.length > 0) && (
-               <div className="flex-1 max-w-md bg-vegas-dark/90 backdrop-blur p-4 rounded-lg neon-border-green pointer-events-auto shadow-lg transition-all duration-300 hover:scale-[1.02]">
-                 <div className="text-neon-green text-xs font-bold uppercase tracking-wider mb-2 flex justify-between px-2">
-                    <span>CFOP Solution</span>
-                    <span>{solutionToDisplay.length} steps</span>
-                 </div>
-                 <div 
-                    ref={solutionScrollRef}
-                    className="flex overflow-x-auto gap-2 py-2 scrollbar-thin scrollbar-thumb-neon-green scrollbar-track-transparent mask-bidirectional-fade"
-                    style={{ paddingLeft: '45%', paddingRight: '45%' }}
-                 >
-                   {solutionToDisplay.map((m, i) => {
-                       const isCurrent = activeMove?.source === 'solution' && activeMove?.index === i;
+                <div className={`transition-all duration-300 bg-vegas-dark/90 backdrop-blur rounded-lg neon-border-green pointer-events-auto shadow-lg hover:scale-[1.02] ${solutionCollapsed ? 'w-12 h-12 flex items-center justify-center p-0 self-end' : 'w-full md:max-w-md p-4'}`}>
+                    <div className={`flex justify-between items-center ${solutionCollapsed ? 'w-full h-full' : 'mb-2'}`}>
+                       {!solutionCollapsed && (
+                         <div className="text-neon-green text-xs font-bold uppercase tracking-wider px-2">
+                           <span>CFOP Solution </span> 
+                           <span className="text-slate-400 font-mono">({solutionToDisplay.length} steps)</span>
+                         </div>
+                       )}
+                       <button 
+                           onClick={() => setSolutionCollapsed(!solutionCollapsed)}
+                           className={`rounded-lg cursor-pointer hover:bg-neon-green/20 text-neon-green transition-colors ${solutionCollapsed ? 'w-full h-full flex items-center justify-center' : 'p-1'}`}
+                           aria-label={solutionCollapsed ? "Expand Solution" : "Collapse Solution"}
+                           title={solutionCollapsed ? "Expand Solution" : "Collapse Solution"}
+                       >
+                           {solutionCollapsed ? (
+                               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 3h4v4h-4z"/><path d="M3 10h4v4H3z"/><path d="M17 10h4v4h-4z"/><path d="M10 17h4v4h-4z"/><path d="M7 10v4"/><path d="M10 7h4"/><path d="M10 17v-4"/><path d="M17 10h-4"/></svg>
+                           ) : (
+                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/></svg>
+                           )}
+                       </button>
+                    </div>
 
-                       return (
-                         <span 
-                            key={`sol-${i}`} 
-                            ref={isCurrent ? activeSolutionRef : null}
-                            className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded font-mono font-bold text-sm border transition-all ${
-                                isCurrent 
-                                    ? 'bg-neon-yellow text-black box-glow-yellow border-neon-yellow scale-110 z-10'
-                                    : 'bg-vegas-black text-neon-green border-neon-green/30 opacity-80'
-                            }`}
-                         >
-                           {m.move}
-                         </span>
-                       );
-                   })}
-                 </div>
+                    {!solutionCollapsed && (
+                        <div 
+                           ref={solutionScrollRef}
+                           className="flex overflow-x-auto gap-2 py-2 scrollbar-thin scrollbar-thumb-neon-green scrollbar-track-transparent mask-bidirectional-fade"
+                           style={{ paddingLeft: '45%', paddingRight: '45%' }}
+                        >
+                          {solutionToDisplay.map((m, i) => {
+                              const isCurrent = activeMove?.source === 'solution' && activeMove?.index === i;
+
+                              return (
+                                <span 
+                                   key={`sol-${i}`} 
+                                   ref={isCurrent ? activeSolutionRef : null}
+                                   className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded font-mono font-bold text-sm border transition-all ${
+                                       isCurrent 
+                                           ? 'bg-neon-yellow text-black box-glow-yellow border-neon-yellow scale-110 z-10'
+                                           : 'bg-vegas-black text-neon-green border-neon-green/30 opacity-80'
+                                   }`}
+                                >
+                                  {m.move}
+                                </span>
+                              );
+                          })}
+                        </div>
+                    )}
                </div>
              )}
           </div>
@@ -430,6 +471,28 @@ function App() {
             </div>
         )}
       </div>
+
+      {/* Progress Bar */}
+      {(isSolving || isScrambling) && (
+        <div className="h-2 w-full bg-vegas-black/50 backdrop-blur-sm relative overflow-hidden z-20 border-t border-white/10">
+            <div 
+                className={`absolute top-0 left-0 bottom-0 transition-all duration-300 ease-out ${
+                    isScrambling 
+                        ? 'bg-gradient-to-r from-neon-yellow via-neon-orange to-neon-yellow animate-gradient-x' 
+                        : 'bg-gradient-to-r from-neon-green via-emerald-400 to-neon-green animate-gradient-x'
+                }`}
+                style={{ 
+                    width: `${(() => {
+                        const total = isScrambling ? totalScrambleMoves : solutionToDisplay.length;
+                        if (total <= 0) return 0;
+                        const completed = total - futureMoves.length + (activeMove ? 1 : 0);
+                        return Math.min(100, Math.max(0, (completed / total) * 100));
+                    })()}%`,
+                    backgroundSize: '200% 100%' 
+                }}
+            />
+        </div>
+      )}
 
       {/* Bottom Panel */}
       <div className="bg-vegas-black border-t border-neon-cyan/20 flex flex-col shrink-0 z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">

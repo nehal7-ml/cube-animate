@@ -92,10 +92,42 @@ export function About({ onClose, isOpen }: Props) {
             </ul>
           </section>
 
-          <div className="pt-4 border-t border-neon-purple/30 flex items-center justify-center">
+          <section>
+            <h3 className="text-neon-purple font-bold mb-3 text-glow-pink">Tech Stack</h3>
+            <div className="flex flex-wrap gap-6 items-center justify-center bg-vegas-black/30 p-4 rounded-xl border border-neon-purple/20">
+              {[
+                { name: 'Vite', icon: 'https://cdn.simpleicons.org/vite/646CFF', url: 'https://vitejs.dev' },
+                { name: 'React', icon: 'https://cdn.simpleicons.org/react/61DAFB', url: 'https://react.dev' },
+                { name: 'Tailwind', icon: 'https://cdn.simpleicons.org/tailwindcss/06B6D4', url: 'https://tailwindcss.com' },
+                { name: 'Vercel', icon: 'https://cdn.simpleicons.org/vercel/FFFFFF', url: 'https://vercel.com' },
+              ].map((tech) => (
+                <a 
+                  key={tech.name} 
+                  href={tech.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="group flex flex-col items-center gap-2 transition-transform hover:scale-110"
+                >
+                  <img src={tech.icon} alt={tech.name} className="w-8 h-8 opacity-80 group-hover:opacity-100 transition-opacity" />
+                  <span className="text-[10px] uppercase font-bold text-slate-500 group-hover:text-slate-300 tracking-wider">{tech.name}</span>
+                </a>
+              ))}
+            </div>
+          </section>
+
+          <div className="pt-4 border-t border-neon-purple/30 flex flex-col items-center justify-center gap-3">
              <div className="bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan text-transparent bg-clip-text font-bold text-sm flex items-center gap-2 animate-pulse">
                 <span className="text-lg">✨</span> Vibe coded with Gemini 2.0 Flash
              </div>
+             <a 
+                href="https://software-smith.in" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs text-slate-500 hover:text-neon-cyan transition-colors flex items-center gap-1 group"
+             >
+                Built by <span className="font-bold group-hover:underline">Software Smith</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-50 group-hover:opacity-100"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+             </a>
           </div>
 
         </div>
