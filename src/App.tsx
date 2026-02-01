@@ -12,6 +12,7 @@ import { ManualControls } from './components/ManualControls';
 import { About } from './components/About';
 import { Toast } from './components/Toast';
 import { MiniCube } from './components/MiniCube';
+import { TokenStats } from './components/TokenStats';
 
 // Component to handle responsive camera adjustments without remounting the Canvas
 function ResponsiveCamera({ isMobile, isKeypadOpen }: { isMobile: boolean; isKeypadOpen: boolean }) {
@@ -111,6 +112,7 @@ function App() {
   const [historyCollapsed, setHistoryCollapsed] = useState(false);
   const [solutionCollapsed, setSolutionCollapsed] = useState(false);
   const [totalScrambleMoves, setTotalScrambleMoves] = useState(0);
+  const [showTokenStats, setShowTokenStats] = useState(false);
   const [toastMsg, setToastMessage] = useState<string | null>(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
@@ -536,7 +538,12 @@ function App() {
         </div>
       </div>
       
-      <About isOpen={showAbout} onClose={() => setShowAbout(false)} />
+      <About 
+        isOpen={showAbout} 
+        onClose={() => setShowAbout(false)} 
+        onOpenStats={() => setShowTokenStats(true)}
+      />
+      <TokenStats isOpen={showTokenStats} onClose={() => setShowTokenStats(false)} />
     </div>
   );
 }

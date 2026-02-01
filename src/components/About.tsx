@@ -4,9 +4,10 @@ import { MiniCube } from './MiniCube';
 interface Props {
   onClose: () => void;
   isOpen: boolean;
+  onOpenStats?: () => void;
 }
 
-export function About({ onClose, isOpen }: Props) {
+export function About({ onClose, isOpen, onOpenStats }: Props) {
   // Handle ESC key to close
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -116,8 +117,19 @@ export function About({ onClose, isOpen }: Props) {
           </section>
 
           <div className="pt-4 border-t border-neon-purple/30 flex flex-col items-center justify-center gap-3">
-             <div className="bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan text-transparent bg-clip-text font-bold text-sm flex items-center gap-2 animate-pulse">
-                <span className="text-lg">✨</span> Vibe coded with Gemini 2.0 Flash
+             <div className="flex flex-col items-center gap-2">
+                <div className="bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan text-transparent bg-clip-text font-bold text-sm flex items-center gap-2">
+                    <img src="https://cdn.simpleicons.org/googlegemini/8E75B2" alt="Gemini" className="w-5 h-5 animate-pulse" />
+                    Vibe coded with Gemini Code Assist
+                </div>
+                {onOpenStats && (
+                    <button 
+                        onClick={onOpenStats}
+                        className="text-[10px] text-neon-cyan hover:text-white transition-colors uppercase tracking-widest font-bold border border-neon-cyan/30 px-2 py-0.5 rounded hover:bg-neon-cyan/20 cursor-pointer"
+                    >
+                        View Token Stats
+                    </button>
+                )}
              </div>
              <a 
                 href="https://software-smith.in" 
