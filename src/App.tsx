@@ -497,9 +497,13 @@ function App() {
              
              {/* Box 1: History */}
              {(pastMoves.length > 0 || (activeMove && !isSolving)) && (
-                <div className={`transition-all duration-300 bg-vegas-dark/90 backdrop-blur rounded-lg neon-border-pink pointer-events-auto shadow-lg hover:scale-[1.02] ${historyCollapsed ? 'w-12 h-12 flex items-center justify-center p-0 self-start md:self-end' : 'w-full md:max-w-md p-4'}`}>
+                <div className={`overflow-hidden transition-all duration-300 bg-vegas-dark/90 backdrop-blur rounded-lg neon-border-pink pointer-events-auto shadow-lg hover:scale-[1.02] ${historyCollapsed ? 'w-12 h-12 flex items-center justify-center p-0 self-start md:self-end' : 'w-full md:max-w-md p-4'}`}>
                     <div className={`flex justify-between items-center ${historyCollapsed ? 'w-full h-full' : 'mb-2'}`}>
-                       {!historyCollapsed && <div className="text-neon-pink text-xs font-bold uppercase tracking-wider px-2">History / Scramble</div>}
+                       {!historyCollapsed && (
+                         <div className="text-neon-pink text-xs font-bold uppercase tracking-wider px-2 animate-in fade-in duration-500">
+                           History / Scramble
+                         </div>
+                       )}
                        <button 
                            onClick={() => setHistoryCollapsed(!historyCollapsed)}
                            className={`rounded-lg cursor-pointer hover:bg-neon-pink/20 text-neon-pink transition-colors ${historyCollapsed ? 'w-full h-full flex items-center justify-center' : 'p-1'}`}
@@ -514,7 +518,7 @@ function App() {
                        </button>
                     </div>
                     
-                    {!historyCollapsed && (
+                    <div className={`transition-opacity duration-300 ${historyCollapsed ? 'opacity-0 h-0' : 'opacity-100'}`}>
                         <div 
                             ref={historyScrollRef}
                             className="flex overflow-x-auto gap-2 py-2 scrollbar-thin scrollbar-thumb-neon-pink scrollbar-track-transparent mask-bidirectional-fade"
@@ -540,16 +544,16 @@ function App() {
                                 </span>
                             )}
                         </div>
-                    )}
+                    </div>
                 </div>
              )}
 
              {/* Box 2: CFOP Solution (Persistent) */}
              {(solutionToDisplay.length > 0) && (
-                <div className={`transition-all duration-300 bg-vegas-dark/90 backdrop-blur rounded-lg neon-border-green pointer-events-auto shadow-lg hover:scale-[1.02] ${solutionCollapsed ? 'w-12 h-12 flex items-center justify-center p-0 self-start md:self-end' : 'w-full md:max-w-md p-4'}`}>
+                <div className={`overflow-hidden transition-all duration-300 bg-vegas-dark/90 backdrop-blur rounded-lg neon-border-green pointer-events-auto shadow-lg hover:scale-[1.02] ${solutionCollapsed ? 'w-12 h-12 flex items-center justify-center p-0 self-start md:self-end' : 'w-full md:max-w-md p-4'}`}>
                     <div className={`flex justify-between items-center ${solutionCollapsed ? 'w-full h-full' : 'mb-2'}`}>
                        {!solutionCollapsed && (
-                         <div className="text-neon-green text-xs font-bold uppercase tracking-wider px-2">
+                         <div className="text-neon-green text-xs font-bold uppercase tracking-wider px-2 animate-in fade-in duration-500">
                            <span>CFOP Solution </span> 
                            <span className="text-slate-400 font-mono">({solutionToDisplay.length} steps)</span>
                          </div>
@@ -568,7 +572,7 @@ function App() {
                        </button>
                     </div>
 
-                    {!solutionCollapsed && (
+                    <div className={`transition-opacity duration-300 ${solutionCollapsed ? 'opacity-0 h-0' : 'opacity-100'}`}>
                         <div 
                            ref={solutionScrollRef}
                            className="flex overflow-x-auto gap-2 py-2 scrollbar-thin scrollbar-thumb-neon-green scrollbar-track-transparent mask-bidirectional-fade"
@@ -592,7 +596,7 @@ function App() {
                               );
                           })}
                         </div>
-                    )}
+                    </div>
                </div>
              )}
           </div>
