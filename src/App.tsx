@@ -60,7 +60,7 @@ function RotationTracker({
   cameraRef 
 }: { 
   rotationRef: React.MutableRefObject<THREE.Quaternion>, 
-  cubeGroupRef: React.RefObject<THREE.Group>,
+  cubeGroupRef: React.RefObject<THREE.Group | null>,
   cameraRef: React.MutableRefObject<THREE.Camera | null>
 }) {
   const { camera } = useThree();
@@ -445,7 +445,14 @@ function App() {
         <div className="flex-1 relative touch-none min-h-0 min-w-0">
           <Canvas 
             shadows 
-            gl={{ antialias: true }} 
+            dpr={isMobile ? [1, 1.5] : [1, 2]}
+            gl={{ 
+                antialias: true, 
+                powerPreference: 'high-performance',
+                alpha: false, // Opaque canvas is faster
+                stencil: false,
+                depth: true
+            }} 
             style={{ touchAction: 'none' }}
           >
             <ResponsiveCamera isMobile={isMobile} isKeypadOpen={showKeypad} />
@@ -458,7 +465,7 @@ function App() {
               position={[5, 10, 5]} 
               intensity={1} 
               castShadow 
-              shadow-mapSize={[2048, 2048]}
+              shadow-mapSize={isMobile ? [512, 512] : [1024, 1024]}
               shadow-bias={-0.001}
             />
             
@@ -490,7 +497,7 @@ function App() {
              
              {/* Box 1: History */}
              {(pastMoves.length > 0 || (activeMove && !isSolving)) && (
-                <div className={`transition-all duration-300 bg-vegas-dark/90 backdrop-blur rounded-lg neon-border-pink pointer-events-auto shadow-lg hover:scale-[1.02] ${historyCollapsed ? 'w-12 h-12 flex items-center justify-center p-0 self-end' : 'w-full md:max-w-md p-4'}`}>
+                <div className={`transition-all duration-300 bg-vegas-dark/90 backdrop-blur rounded-lg neon-border-pink pointer-events-auto shadow-lg hover:scale-[1.02] ${historyCollapsed ? 'w-12 h-12 flex items-center justify-center p-0 self-start md:self-end' : 'w-full md:max-w-md p-4'}`}>
                     <div className={`flex justify-between items-center ${historyCollapsed ? 'w-full h-full' : 'mb-2'}`}>
                        {!historyCollapsed && <div className="text-neon-pink text-xs font-bold uppercase tracking-wider px-2">History / Scramble</div>}
                        <button 
@@ -539,7 +546,7 @@ function App() {
 
              {/* Box 2: CFOP Solution (Persistent) */}
              {(solutionToDisplay.length > 0) && (
-                <div className={`transition-all duration-300 bg-vegas-dark/90 backdrop-blur rounded-lg neon-border-green pointer-events-auto shadow-lg hover:scale-[1.02] ${solutionCollapsed ? 'w-12 h-12 flex items-center justify-center p-0 self-end' : 'w-full md:max-w-md p-4'}`}>
+                <div className={`transition-all duration-300 bg-vegas-dark/90 backdrop-blur rounded-lg neon-border-green pointer-events-auto shadow-lg hover:scale-[1.02] ${solutionCollapsed ? 'w-12 h-12 flex items-center justify-center p-0 self-start md:self-end' : 'w-full md:max-w-md p-4'}`}>
                     <div className={`flex justify-between items-center ${solutionCollapsed ? 'w-full h-full' : 'mb-2'}`}>
                        {!solutionCollapsed && (
                          <div className="text-neon-green text-xs font-bold uppercase tracking-wider px-2">
