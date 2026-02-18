@@ -1,0 +1,17 @@
+{
+  "project_name": "rubiks-animate",
+  "lifetime_stats": {
+    "total_input_tokens": 362000,
+    "total_output_tokens": 122500,
+    "total_requests": 84
+  },
+  "model_stats": {
+    "gemini-3.0": {
+      "input_tokens": 362000,
+      "output_tokens": 122500,
+      "requests": 84,
+      "description": "Primary architectural and logic model used via Gemini Code Assist"
+    }
+  },
+  "last_updated": "2026-02-18"
+}

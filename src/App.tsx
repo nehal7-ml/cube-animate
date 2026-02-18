@@ -51,6 +51,127 @@ function ResponsiveCamera({ isMobile, isKeypadOpen }: { isMobile: boolean; isKey
   return null;
 }
 
+/**
+ * Tracks the current orientation of the cube group and camera to map visual moves to logical moves.
+ */
+function RotationTracker({ 
+  rotationRef, 
+  cubeGroupRef, 
+  cameraRef 
+}: { 
+  rotationRef: React.MutableRefObject<THREE.Quaternion>, 
+  cubeGroupRef: React.RefObject<THREE.Group>,
+  cameraRef: React.MutableRefObject<THREE.Camera | null>
+}) {
+  const { camera } = useThree();
+  useFrame(() => {
+    if (cubeGroupRef.current) {
+      cubeGroupRef.current.getWorldQuaternion(rotationRef.current);
+    }
+    cameraRef.current = camera;
+  });
+  return null;
+}
+
+/**
+ * Maps a visual move (e.g., "U" meaning "turn the top face in view") 
+ * to a logical move (e.g., "F") based on the cube's current orientation 
+ * and the camera's perspective.
+ */
+function mapManualMove(move: string, quaternion: THREE.Quaternion, camera: THREE.Camera): string {
+  const baseMoveChar = move[0];
+  const baseMove = baseMoveChar.toUpperCase();
+  const isPrime = move.includes("'");
+  const isDouble = move.includes("2");
+  const isLower = baseMoveChar >= 'a' && baseMoveChar <= 'z';
+
+  // 1. Get Visual Axes from Camera (World Space)
+  // matrixWorld columns: 0: Right, 1: Up, 2: Back (-Front)
+  const matrix = camera.matrixWorld;
+  const vRight = new THREE.Vector3(matrix.elements[0], matrix.elements[1], matrix.elements[2]);
+  const vUp = new THREE.Vector3(matrix.elements[4], matrix.elements[5], matrix.elements[6]);
+  const vFront = new THREE.Vector3(-matrix.elements[8], -matrix.elements[9], -matrix.elements[10]);
+
+  // 2. Map visual move to a world axis, layer, and base CW angle
+  let worldAxis = new THREE.Vector3();
+  let layer = 0;
+  let visualCWAngle = -90; 
+
+  switch(baseMove) {
+    case 'U': worldAxis.copy(vUp); layer = 1; break;
+    case 'D': worldAxis.copy(vUp); layer = -1; visualCWAngle = 90; break;
+    case 'R': worldAxis.copy(vRight); layer = 1; break;
+    case 'L': worldAxis.copy(vRight); layer = -1; visualCWAngle = 90; break;
+    case 'F': worldAxis.copy(vFront); layer = 1; break;
+    case 'B': worldAxis.copy(vFront); layer = -1; visualCWAngle = 90; break;
+    case 'M': worldAxis.copy(vRight); layer = 0; visualCWAngle = 90; break;
+    case 'E': worldAxis.copy(vUp); layer = 0; visualCWAngle = 90; break;
+    case 'S': worldAxis.copy(vFront); layer = 0; visualCWAngle = -90; break;
+    default: return move;
+  }
+
+  // Adjust angle for suffixes
+  let angle = visualCWAngle;
+  if (isPrime) angle *= -1;
+  if (isDouble) angle = 180;
+
+  // 3. Transform World Axis to Local Cube Axis
+  const localAxis = worldAxis.clone().applyQuaternion(quaternion.clone().invert());
+
+  // 4. Find the closest logical axis (X, Y, or Z)
+  const axes = [
+    { name: 'X', dir: new THREE.Vector3(1, 0, 0) },
+    { name: 'Y', dir: new THREE.Vector3(0, 1, 0) },
+    { name: 'Z', dir: new THREE.Vector3(0, 0, 1) },
+  ];
+
+  let bestDot = -1;
+  let bestAxisDir = axes[0].dir;
+  let axisSign = 1;
+
+  axes.forEach(a => {
+    const d = localAxis.dot(a.dir);
+    if (Math.abs(d) > bestDot) {
+      bestDot = Math.abs(d);
+      bestAxisDir = a.dir;
+      axisSign = d > 0 ? 1 : -1;
+    }
+  });
+
+  // 5. Determine target logical parameters
+  const targetLayer = layer * axisSign;
+  const targetAngle = angle * axisSign;
+
+  // 6. Match with Logical Moves defined in cube3d.ts
+  const logicalMoves = [
+    { name: 'R', lAxis: new THREE.Vector3(1, 0, 0), lLayer: 1, lAngle: -90 },
+    { name: 'L', lAxis: new THREE.Vector3(1, 0, 0), lLayer: -1, lAngle: 90 },
+    { name: 'U', lAxis: new THREE.Vector3(0, 1, 0), lLayer: 1, lAngle: -90 },
+    { name: 'D', lAxis: new THREE.Vector3(0, 1, 0), lLayer: -1, lAngle: 90 },
+    { name: 'F', lAxis: new THREE.Vector3(0, 0, 1), lLayer: 1, lAngle: -90 },
+    { name: 'B', lAxis: new THREE.Vector3(0, 0, 1), lLayer: -1, lAngle: 90 },
+    { name: 'M', lAxis: new THREE.Vector3(1, 0, 0), lLayer: 0, lAngle: 90 },
+    { name: 'E', lAxis: new THREE.Vector3(0, 1, 0), lLayer: 0, lAngle: 90 },
+    { name: 'S', lAxis: new THREE.Vector3(0, 0, 1), lLayer: 0, lAngle: -90 },
+  ];
+
+  const normTarget = ((targetAngle % 360) + 360) % 360;
+
+  for (const lm of logicalMoves) {
+    if (lm.lAxis.equals(bestAxisDir) && lm.lLayer === targetLayer) {
+      const moveName = isLower ? lm.name.toLowerCase() : lm.name;
+      const normLM = ((lm.lAngle % 360) + 360) % 360;
+      const normLMPrime = (((-lm.lAngle) % 360) + 360) % 360;
+
+      if (normTarget === normLM) return moveName;
+      if (normTarget === normLMPrime) return moveName + "'";
+      if (normTarget === 180) return moveName + "2";
+    }
+  }
+
+  return move;
+}
+
 // Helper to expand complex moves
 function expandMoves(moves: string[]): string[] {
   const expanded: string[] = [];
@@ -116,6 +237,11 @@ function App() {
   const [toastMsg, setToastMessage] = useState<string | null>(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
+  // Refs for orientation-aware moves
+  const cubeGroupRef = useRef<THREE.Group>(null);
+  const cubeRotationRef = useRef<THREE.Quaternion>(new THREE.Quaternion());
+  const cameraRef = useRef<THREE.Camera | null>(null);
+
   // Refs for scrolling logic
   const historyScrollRef = useRef<HTMLDivElement>(null);
   const solutionScrollRef = useRef<HTMLDivElement>(null);
@@ -206,7 +332,11 @@ function App() {
   }, [activeMove]);
 
   const handleMove = (m: string) => {
-    const moves = expandMoves([m]);
+    let mappedMove = m;
+    if (cameraRef.current) {
+        mappedMove = mapManualMove(m, cubeRotationRef.current, cameraRef.current);
+    }
+    const moves = expandMoves([mappedMove]);
     setFutureMoves(prev => [...prev, ...moves.map(move => ({ move, source: 'user' } as MoveData))]);
   };
 
@@ -319,6 +449,7 @@ function App() {
             style={{ touchAction: 'none' }}
           >
             <ResponsiveCamera isMobile={isMobile} isKeypadOpen={showKeypad} />
+            <RotationTracker rotationRef={cubeRotationRef} cubeGroupRef={cubeGroupRef} cameraRef={cameraRef} />
             <ambientLight intensity={0.4} />
             <pointLight position={[10, 10, 10]} intensity={1.5} color="#ff00ff" distance={30} />
             <pointLight position={[-10, 5, 10]} intensity={1.5} color="#00ffff" distance={30} />
@@ -339,7 +470,9 @@ function App() {
               polar={[-Infinity, Infinity]}
               azimuth={[-Infinity, Infinity]}
             >
-              <VisualCube cube={cube} activeMove={activeMove?.move} onMoveComplete={onMoveComplete} />
+              <group ref={cubeGroupRef}>
+                <VisualCube cube={cube} activeMove={activeMove?.move} onMoveComplete={onMoveComplete} />
+              </group>
             </PresentationControls>
             
             <ContactShadows 
