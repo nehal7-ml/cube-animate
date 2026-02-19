@@ -5,25 +5,25 @@ import * as THREE from 'three';
 import { type CubeState, type Color, type Cubie } from '../logic/cube3d';
 
 // Glossy Sticker Materials - Brighter & More Vibrant (Neon Tuned)
-// Optimized: Switched from MeshPhysicalMaterial to MeshStandardMaterial for better performance on mobile.
+// Optimized: Using MeshStandardMaterial with emissive for brightness and performance.
 const stickerMaterials: Record<Color, THREE.Material> = {
   white: new THREE.MeshStandardMaterial({ 
-    color: '#ffffff', roughness: 0.1, metalness: 0.3
+    color: '#ffffff', emissive: '#444444', roughness: 0.1, metalness: 0.3
   }),
   yellow: new THREE.MeshStandardMaterial({ 
-    color: '#ffff00', roughness: 0.1, metalness: 0.3
+    color: '#ffff00', emissive: '#444400', roughness: 0.1, metalness: 0.3
   }),
   orange: new THREE.MeshStandardMaterial({ 
-    color: '#ff8800', roughness: 0.1, metalness: 0.3
+    color: '#ff8800', emissive: '#442200', roughness: 0.1, metalness: 0.3
   }),
   red: new THREE.MeshStandardMaterial({ 
-    color: '#ff0000', roughness: 0.1, metalness: 0.3
+    color: '#ff0000', emissive: '#440000', roughness: 0.1, metalness: 0.3
   }),
   green: new THREE.MeshStandardMaterial({ 
-    color: '#00ff00', roughness: 0.1, metalness: 0.3
+    color: '#00ff00', emissive: '#004400', roughness: 0.1, metalness: 0.3
   }),
   blue: new THREE.MeshStandardMaterial({ 
-    color: '#0088ff', roughness: 0.1, metalness: 0.3
+    color: '#0088ff', emissive: '#002244', roughness: 0.1, metalness: 0.3
   }),
 };
 

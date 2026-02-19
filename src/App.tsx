@@ -253,13 +253,13 @@ function App() {
     if (activeHistoryRef.current) {
         activeHistoryRef.current.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     }
-  }, [activeMove, pastMoves]);
+  }, [activeMove, pastMoves, historyCollapsed]);
 
   useEffect(() => {
     if (activeSolutionRef.current) {
         activeSolutionRef.current.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     }
-  }, [activeMove, solutionToDisplay]);
+  }, [activeMove, solutionToDisplay, solutionCollapsed]);
 
   // Draggable Manual Controls State (Imperative for performance)
   const manualControlsRef = useRef<HTMLDivElement>(null);
@@ -449,7 +449,7 @@ function App() {
             gl={{ 
                 antialias: true, 
                 powerPreference: 'high-performance',
-                alpha: false, // Opaque canvas is faster
+                alpha: true, 
                 stencil: false,
                 depth: true
             }} 
@@ -457,13 +457,13 @@ function App() {
           >
             <ResponsiveCamera isMobile={isMobile} isKeypadOpen={showKeypad} />
             <RotationTracker rotationRef={cubeRotationRef} cubeGroupRef={cubeGroupRef} cameraRef={cameraRef} />
-            <ambientLight intensity={0.4} />
-            <pointLight position={[10, 10, 10]} intensity={1.5} color="#ff00ff" distance={30} />
-            <pointLight position={[-10, 5, 10]} intensity={1.5} color="#00ffff" distance={30} />
+            <ambientLight intensity={1.2} />
+            <pointLight position={[10, 10, 10]} intensity={3.5} color="#ff00ff" distance={40} />
+            <pointLight position={[-10, 5, 10]} intensity={3.5} color="#00ffff" distance={40} />
             
             <directionalLight 
               position={[5, 10, 5]} 
-              intensity={1} 
+              intensity={2.5} 
               castShadow 
               shadow-mapSize={isMobile ? [512, 512] : [1024, 1024]}
               shadow-bias={-0.001}
@@ -497,28 +497,25 @@ function App() {
              
              {/* Box 1: History */}
              {(pastMoves.length > 0 || (activeMove && !isSolving)) && (
-                <div className={`overflow-hidden transition-all duration-300 bg-vegas-dark/90 backdrop-blur rounded-lg neon-border-pink pointer-events-auto shadow-lg hover:scale-[1.02] ${historyCollapsed ? 'w-12 h-12 flex items-center justify-center p-0 self-start md:self-end' : 'w-full md:max-w-md p-4'}`}>
-                    <div className={`flex justify-between items-center ${historyCollapsed ? 'w-full h-full' : 'mb-2'}`}>
-                       {!historyCollapsed && (
-                         <div className="text-neon-pink text-xs font-bold uppercase tracking-wider px-2 animate-in fade-in duration-500">
-                           History / Scramble
-                         </div>
-                       )}
+                <div className={`transition-all duration-500 ease-in-out bg-vegas-dark/95 backdrop-blur-md rounded-lg neon-border-pink pointer-events-auto shadow-2xl hover:scale-[1.01] flex flex-col overflow-hidden self-start md:max-w-md ${historyCollapsed ? 'w-12' : 'w-full'}`}>
+                    <div className={`flex items-center shrink-0 transition-all duration-500 ${historyCollapsed ? 'w-12 h-12 justify-center' : 'w-full h-12 px-4 justify-between'}`}>
+                       <div className={`text-neon-pink text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 overflow-hidden truncate ${historyCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+                         History / Scramble
+                       </div>
                        <button 
                            onClick={() => setHistoryCollapsed(!historyCollapsed)}
-                           className={`rounded-lg cursor-pointer hover:bg-neon-pink/20 text-neon-pink transition-colors ${historyCollapsed ? 'w-full h-full flex items-center justify-center' : 'p-1'}`}
+                           className={`rounded-lg cursor-pointer hover:bg-neon-pink/20 text-neon-pink transition-all flex items-center justify-center shrink-0 ${historyCollapsed ? 'w-full h-full' : 'p-2 bg-vegas-black/50'}`}
                            aria-label={historyCollapsed ? "Expand History" : "Collapse History"}
-                           title={historyCollapsed ? "Expand History" : "Collapse History"}
                        >
                            {historyCollapsed ? (
-                               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+                               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-[0_0_5px_rgba(255,0,255,0.8)]"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
                            ) : (
-                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/></svg>
+                               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/></svg>
                            )}
                        </button>
                     </div>
                     
-                    <div className={`transition-opacity duration-300 ${historyCollapsed ? 'opacity-0 h-0' : 'opacity-100'}`}>
+                    <div className={`transition-all duration-500 ease-in-out overflow-hidden ${historyCollapsed ? 'max-h-0 opacity-0' : 'max-h-40 opacity-100 p-4 pt-0'}`}>
                         <div 
                             ref={historyScrollRef}
                             className="flex overflow-x-auto gap-2 py-2 scrollbar-thin scrollbar-thumb-neon-pink scrollbar-track-transparent mask-bidirectional-fade"
@@ -550,29 +547,25 @@ function App() {
 
              {/* Box 2: CFOP Solution (Persistent) */}
              {(solutionToDisplay.length > 0) && (
-                <div className={`overflow-hidden transition-all duration-300 bg-vegas-dark/90 backdrop-blur rounded-lg neon-border-green pointer-events-auto shadow-lg hover:scale-[1.02] ${solutionCollapsed ? 'w-12 h-12 flex items-center justify-center p-0 self-start md:self-end' : 'w-full md:max-w-md p-4'}`}>
-                    <div className={`flex justify-between items-center ${solutionCollapsed ? 'w-full h-full' : 'mb-2'}`}>
-                       {!solutionCollapsed && (
-                         <div className="text-neon-green text-xs font-bold uppercase tracking-wider px-2 animate-in fade-in duration-500">
-                           <span>CFOP Solution </span> 
-                           <span className="text-slate-400 font-mono">({solutionToDisplay.length} steps)</span>
-                         </div>
-                       )}
+                <div className={`transition-all duration-500 ease-in-out bg-vegas-dark/95 backdrop-blur-md rounded-lg neon-border-green pointer-events-auto shadow-2xl hover:scale-[1.01] flex flex-col overflow-hidden self-start md:max-w-md ${solutionCollapsed ? 'w-12' : 'w-full'}`}>
+                    <div className={`flex items-center shrink-0 transition-all duration-500 ${solutionCollapsed ? 'w-12 h-12 justify-center' : 'w-full h-12 px-4 justify-between'}`}>
+                       <div className={`text-neon-green text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 overflow-hidden truncate ${solutionCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+                         CFOP Solution <span className="opacity-50 font-mono ml-1">[{solutionToDisplay.length}]</span>
+                       </div>
                        <button 
                            onClick={() => setSolutionCollapsed(!solutionCollapsed)}
-                           className={`rounded-lg cursor-pointer hover:bg-neon-green/20 text-neon-green transition-colors ${solutionCollapsed ? 'w-full h-full flex items-center justify-center' : 'p-1'}`}
+                           className={`rounded-lg cursor-pointer hover:bg-neon-green/20 text-neon-green transition-all flex items-center justify-center shrink-0 ${solutionCollapsed ? 'w-full h-full' : 'p-2 bg-vegas-black/50'}`}
                            aria-label={solutionCollapsed ? "Expand Solution" : "Collapse Solution"}
-                           title={solutionCollapsed ? "Expand Solution" : "Collapse Solution"}
                        >
                            {solutionCollapsed ? (
-                               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 3h4v4h-4z"/><path d="M3 10h4v4H3z"/><path d="M17 10h4v4h-4z"/><path d="M10 17h4v4h-4z"/><path d="M7 10v4"/><path d="M10 7h4"/><path d="M10 17v-4"/><path d="M17 10h-4"/></svg>
+                               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-[0_0_5px_rgba(0,255,0,0.8)]"><path d="M10 3h4v4h-4z"/><path d="M3 10h4v4H3z"/><path d="M17 10h4v4h-4z"/><path d="M10 17h4v4h-4z"/><path d="M7 10v4"/><path d="M10 7h4"/><path d="M10 17v-4"/><path d="M17 10h-4"/></svg>
                            ) : (
-                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/></svg>
+                               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/></svg>
                            )}
                        </button>
                     </div>
 
-                    <div className={`transition-opacity duration-300 ${solutionCollapsed ? 'opacity-0 h-0' : 'opacity-100'}`}>
+                    <div className={`transition-all duration-500 ease-in-out overflow-hidden ${solutionCollapsed ? 'max-h-0 opacity-0' : 'max-h-40 opacity-100 p-4 pt-0'}`}>
                         <div 
                            ref={solutionScrollRef}
                            className="flex overflow-x-auto gap-2 py-2 scrollbar-thin scrollbar-thumb-neon-green scrollbar-track-transparent mask-bidirectional-fade"
