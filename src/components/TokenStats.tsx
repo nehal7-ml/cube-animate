@@ -61,16 +61,10 @@ export function TokenStats({ onClose, isOpen }: Props) {
               <div className="bg-vegas-black/30 p-4 rounded-xl border border-white/5">
                  <div className="text-slate-400 text-xs font-bold uppercase mb-1">Input Tokens</div>
                  <div className="text-2xl font-mono font-bold text-neon-blue">~340k</div>
-                 <div className="w-full bg-slate-700 h-1 mt-2 rounded-full overflow-hidden">
-                    <div className="bg-neon-blue h-full w-[85%]"></div>
-                 </div>
               </div>
               <div className="bg-vegas-black/30 p-4 rounded-xl border border-white/5">
                  <div className="text-slate-400 text-xs font-bold uppercase mb-1">Output Tokens</div>
                  <div className="text-2xl font-mono font-bold text-neon-green">~115k</div>
-                 <div className="w-full bg-slate-700 h-1 mt-2 rounded-full overflow-hidden">
-                    <div className="bg-neon-green h-full w-[45%]"></div>
-                 </div>
               </div>
            </div>
 

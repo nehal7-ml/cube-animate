@@ -636,41 +636,43 @@ function App() {
       {/* Bottom Panel */}
       <div className="bg-vegas-black border-t border-neon-cyan/20 flex flex-col shrink-0 z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
         {/* Main Controls */}
-        <div className="p-4 pb-6 safe-area-bottom flex gap-4 items-center justify-center">
+        <div className="p-4 pb-6 safe-area-bottom flex gap-2 md:gap-4 items-center justify-center">
             <button 
                 onClick={handleReset} 
                 disabled={isBusy}
-                className="p-4 rounded-xl bg-transparent border border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-black hover:box-glow-cyan transition-all active:scale-95 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-neon-cyan disabled:hover:shadow-none"
+                className="flex-1 py-3 px-1 rounded-xl bg-transparent border border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-black hover:box-glow-cyan transition-all active:scale-95 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-neon-cyan disabled:hover:shadow-none flex flex-col items-center justify-center gap-1"
                 aria-label="Reset"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                <span className="text-[10px] md:text-xs font-bold uppercase">Reset</span>
             </button>
 
             <button 
                 onClick={handleScramble} 
                 disabled={isBusy}
-                className="flex-1 py-4 bg-transparent border border-neon-orange text-neon-orange font-bold rounded-xl hover:bg-neon-orange hover:text-black hover:box-glow-orange transition-all active:scale-95 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-neon-orange disabled:hover:shadow-none flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(255,170,0,0.2)]"
+                className="flex-1 py-3 px-1 bg-transparent border border-neon-orange text-neon-orange font-bold rounded-xl hover:bg-neon-orange hover:text-black hover:box-glow-orange transition-all active:scale-95 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-neon-orange disabled:hover:shadow-none flex flex-col items-center justify-center gap-1 shadow-[0_0_10px_rgba(255,170,0,0.2)]"
             >
-                <MiniCube type="scramble" className="w-8 h-8 pointer-events-none" />
-                <span className="hidden md:inline">SCRAMBLE</span>
+                <MiniCube type="scramble" className="w-6 h-6 md:w-8 md:h-8 pointer-events-none" />
+                <span className="text-[10px] md:text-xs uppercase">Scramble</span>
             </button>
 
             <button 
                 onClick={() => setShowKeypad(!showKeypad)}
                 disabled={isBusy}
-                className={`p-4 rounded-xl transition-all active:scale-95 disabled:opacity-50 border flex items-center justify-center ${showKeypad ? 'bg-neon-purple text-white border-neon-purple box-glow-pink' : 'bg-transparent text-neon-purple border-neon-purple hover:bg-neon-purple hover:text-white hover:box-glow-pink'}`}
+                className={`flex-1 py-3 px-1 rounded-xl transition-all active:scale-95 disabled:opacity-50 border flex flex-col items-center justify-center gap-1 ${showKeypad ? 'bg-neon-purple text-white border-neon-purple box-glow-pink' : 'bg-transparent text-neon-purple border-neon-purple hover:bg-neon-purple hover:text-white hover:box-glow-pink'}`}
                 aria-label="Manual Controls"
             >
-                <MiniCube type="manual" className="w-8 h-8 pointer-events-none" />
+                <MiniCube type="manual" className="w-6 h-6 md:w-8 md:h-8 pointer-events-none" />
+                <span className="text-[10px] md:text-xs font-bold uppercase">Manual</span>
             </button>
 
             <button 
                 onClick={handleSolve} 
                 disabled={isBusy}
-                className="flex-[1.5] py-4 bg-transparent border border-neon-green text-neon-green font-bold rounded-xl hover:bg-neon-green hover:text-black hover:box-glow-green transition-all active:scale-95 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-neon-green disabled:hover:shadow-none flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(0,255,0,0.2)]"
+                className="flex-[1.2] py-3 px-1 bg-transparent border border-neon-green text-neon-green font-bold rounded-xl hover:bg-neon-green hover:text-black hover:box-glow-green transition-all active:scale-95 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-neon-green disabled:hover:shadow-none flex flex-col items-center justify-center gap-1 shadow-[0_0_10px_rgba(0,255,0,0.2)]"
             >
-                <MiniCube type="solve" className="w-8 h-8 pointer-events-none" />
-                <span className="hidden md:inline">SOLVE</span>
+                <MiniCube type="solve" className="w-6 h-6 md:w-8 md:h-8 pointer-events-none" />
+                <span className="text-[10px] md:text-xs uppercase">Solve</span>
             </button>
         </div>
       </div>
