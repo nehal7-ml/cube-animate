@@ -149,7 +149,7 @@ Contributions are welcome! Feel free to submit issues and pull requests.
 
 ## License
 
-MIT © 2024 Nehal Patel
+MIT © 2024 Nehal SK
 
 ## Acknowledgments
 
